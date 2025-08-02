@@ -13,7 +13,7 @@ import { useUser } from "@clerk/clerk-react"
 
 const App = () => {
 
-  const { user } = useUser()
+  const { user } = useUser();
 
   return (
     <>
