@@ -25,3 +25,4 @@ dist-ssr
 
 client/node_modules/
 client/.env
+.env
