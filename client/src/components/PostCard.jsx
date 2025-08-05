@@ -2,6 +2,7 @@ import { BadgeCheck, Heart, MessageCircle, Share2 } from 'lucide-react'
 import moment from 'moment'
 import React, { useState } from 'react'
 import { dummyUserData } from '../assets/assets'
+import { useNavigate } from 'react-router-dom'
 
 const PostCard = ({post}) => {
 
@@ -15,10 +16,12 @@ const PostCard = ({post}) => {
 
     }
 
+    const navigate = useNavigate()
+
   return (
     <div className=" bg-white rounded-xl shadow p-4 space-y-4 w-full max-w-2xl ">
       {/* User info */}
-      <div className="inline-flex items-center gap-3 cursor-pointer">
+      <div onClick={()=> navigate('/profile/'+ post.user._id)} className="inline-flex items-center gap-3 cursor-pointer">
         <img
           src={post.user.profile_picture}
           alt=""
