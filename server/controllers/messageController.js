@@ -1,6 +1,6 @@
 import fs from "fs";
 import imagekit from "../configs/imagekit.js";
-import Message from "../models/Message";
+import Message from "../models/Message.js";
 import { log } from "console";
 
 // create an empty object to store server side Even connections
