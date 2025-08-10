@@ -1,5 +1,7 @@
 import imagekit from "../configs/imagekit.js";
+import { inngest } from "../Inngest/index.js";
 import Connection from "../models/Connection.js";
+import Post from "../models/Post.js";
 import User from "../models/User.js";
 import fs from "fs";
 
@@ -227,12 +229,17 @@ export const sendConnectionRequest = async (req, res) => {
     });
 
     if (!connection) {
-      await Connection.create({
+     const newConnection = await Connection.create({
         from_user_id: userId,
         to_user_id: id,
       });
 
-      res.json({
+      await inngest.send({
+        name: 'app/connection-request',
+        data: { connectionId: newConnection._id}
+      })
+
+      return res.json({
         success: true,
         message: "Connection request sent successfully",
       });
@@ -295,27 +302,45 @@ export const acceptConnectionsRequest = async (req, res) => {
     const { id } = req.body;
 
     const connection = await Connection.findOne({
-      from_user_id: id, to_user_id: userId
-    })
+      from_user_id: id,
+      to_user_id: userId,
+    });
 
-    if(!connection){
-      return res.json({ success: false, message: 'Connections not found' });
+    if (!connection) {
+      return res.json({ success: false, message: "Connections not found" });
     }
     const user = await User.findById(userId);
     user.connections.push(id);
-    await user.save()
+    await user.save();
 
     const toUser = await User.findById(id);
     toUser.connections.push(userId);
-    await toUser.save()
+    await toUser.save();
 
-    connection.status ='accepted';
+    connection.status = "accepted";
     await connection.save();
 
-    res.json({ success: true, message: 'Connections accept successfully' });
+    res.json({ success: true, message: "Connections accept successfully" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
 
+// get User Profile
 
-    
+export const getUserProfiled = async (req, res) => {
+  try {
+    const { profileId } = req.body;
+
+    const profile = await User.findById(profileId);
+    if (!profile) {
+      return res.json({ success: false, message: "Profile not fount" });
+    }
+
+    const posts = await Post.find({ user: profileId }).populate("user");
+
+    res.json({ success: true, profile, posts });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
