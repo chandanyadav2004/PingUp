@@ -23,7 +23,7 @@ export const addUserStory = async (req,res) => {
 
             })
 
-            media_url = response.url
+            media_url = response.url()
         }
 
         // Create a story
