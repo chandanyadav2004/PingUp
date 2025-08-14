@@ -12,9 +12,10 @@ export const getUserData = async (req, res) => {
     const { userId } = req.auth();
     const user = await User.findById(userId);
     if (!user) {
-      return res.json({ success: false, message: "User not Found" });
-    }
-    res.json({ success: true, user });
+  return res.status(404).json({ success: false, message: "User not Found" });
+}
+res.status(200).json({ success: true, user });
+
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
@@ -73,7 +74,7 @@ export const updateUserData = async (req, res) => {
       const buffer = fs.readFileSync(cover.path);
       const response = await imagekit.upload({
         file: buffer,
-        fileName: profile.originalname,
+        fileName: cover.originalname,
       });
 
       const url = imagekit.url({
@@ -270,6 +271,8 @@ export const getUserConnections = async (req, res) => {
       "connections followers following"
     );
 
+    
+
     const connections = user.connections;
     const followers = user.followers;
     const following = user.following;
@@ -279,7 +282,7 @@ export const getUserConnections = async (req, res) => {
         to_user_id: userId,
         status: "pending",
       }).populate("from_user_id")
-    ).map((connections) => connection.from_user_id);
+    ).map((connection) => connection.from_user_id);
 
     res.json({
       success: true,
@@ -329,20 +332,46 @@ export const acceptConnectionsRequest = async (req, res) => {
 
 // get User Profile
 
+// export const getUserProfiled = async (req, res) => {
+//   try {
+//     const { profileId } = req.body;
+
+//     const profile = await User.findById(profileId);
+//     if (!profile) {
+//       return res.json({ success: false, message: "Profile not fount" });
+//     }
+
+//     const posts = await Post.find({ user: profileId }).populate("user");
+
+//     res.json({ success: true, profile, posts });
+//   } catch (error) {
+//     console.log(error);
+//     res.json({ success: false, message: error.message });
+//   }
+// };
+
 export const getUserProfiled = async (req, res) => {
   try {
     const { profileId } = req.body;
 
-    const profile = await User.findById(profileId);
-    if (!profile) {
-      return res.json({ success: false, message: "Profile not fount" });
-    }
+    // Run profile + posts queries in parallel
+    const [profile, posts] = await Promise.all([
+      User.findById(profileId).select("username full_name location profile_picture avatar bio cover_photo"), // Only necessary fields
+      Post.find({ user: profileId })
+        .select("caption content likes_count createdAt image_urls") // Return only needed post fields
+        .populate("user", "name avatar") // Populate only required user fields
+        .limit(20) // Pagination limit (can adjust)
+        .sort({ createdAt: -1 }) // Most recent first
+    ]);
 
-    const posts = await Post.find({ user: profileId }).populate("user");
+    if (!profile) {
+      return res.json({ success: false, message: "Profile not found" });
+    }
 
     res.json({ success: true, profile, posts });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: error.message });
   }
 };
+
