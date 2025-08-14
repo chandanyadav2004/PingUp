@@ -2,7 +2,9 @@ import { Calendar, MapPin, PenBox, Verified } from "lucide-react";
 import moment from "moment";
 import React from "react";
 
-const UserProfileInfo = ({ user, post, profileId, setShowEdit }) => {
+const UserProfileInfo = ({ user, posts, profileId, setShowEdit }) => {
+ 
+ 
   return (
     <div className=" relative py-4 px-6 md:px-8 bg-white">
       <div className=" flex flex-col md:flex-row items-start gap-6">
@@ -28,7 +30,7 @@ const UserProfileInfo = ({ user, post, profileId, setShowEdit }) => {
               </p>
             </div>
             {/*  if user is not on other profile that means he is opening his profile so we will give edit button  */}
-            {!profileId && (
+            {user._id !== profileId && (
               <button
                 onClick={() => setShowEdit(true)}
                 className=" flex items-center gap-2 border border-gray-300 hover:bg-gray-50 px-4 rounded-lg font-medium transition-colors mt-4 md:mt-0 cursor-pointer "
@@ -55,7 +57,7 @@ const UserProfileInfo = ({ user, post, profileId, setShowEdit }) => {
           <div className=" flex items-center gap-6 mt-6 border-t border-gray-200 pt-4">
             <div className=" ">
               <span className="sm:text-xl font-bold text-gray-900">
-                {post.length}
+                {posts.length}
               </span>
               <span className=" text-xs sm:text-sm text-gray-500 ml-1">
                 Posts
@@ -63,7 +65,7 @@ const UserProfileInfo = ({ user, post, profileId, setShowEdit }) => {
             </div>
             <div className=" ">
               <span className="sm:text-xl font-bold text-gray-900">
-                {user.followers.length}
+                {user?.followers?.length}
               </span>
               <span className=" text-xs sm:text-sm text-gray-500 ml-1">
                 Followers
@@ -72,7 +74,7 @@ const UserProfileInfo = ({ user, post, profileId, setShowEdit }) => {
 
             <div className=" ">
               <span className="sm:text-xl font-bold text-gray-900">
-                {user.following.length}
+                {user?.following?.length || 0}
               </span>
               <span className=" text-xs sm:text-sm text-gray-500 ml-1">
                 Following
