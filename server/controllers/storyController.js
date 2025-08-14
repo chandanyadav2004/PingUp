@@ -11,7 +11,7 @@ export const addUserStory = async (req,res) => {
         
         const { userId } = req.auth();
         const { content, media_type, background_color} = req.body;
-        const media = req.files;
+        const media = req.file;
         let media_url = '';
 
         // Upload media to imagekit
@@ -23,7 +23,7 @@ export const addUserStory = async (req,res) => {
 
             })
 
-            media_url = response.url()
+            media_url = response.url
         }
 
         // Create a story
