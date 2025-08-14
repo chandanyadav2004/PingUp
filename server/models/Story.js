@@ -6,7 +6,7 @@ const storySchema = new mongoose.Schema({
     media_url: {type: String},
     media_type: {type: String, enum: ['text', 'image', 'video']},
     views_count: [{type: String, ref: 'User'}],
-    background: {type: String},
+    background_color: {type: String},
 
 
 },{timestamps:true, minimize:false});
